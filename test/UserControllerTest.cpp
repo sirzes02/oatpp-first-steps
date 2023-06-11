@@ -46,7 +46,9 @@ void UserControllerTest::onRun()
                dto->userName = "jondoe";
                dto->email = "jon.doe@abc.com";
                dto->password = "1234";
-
+               dto->status = Status::ACTIVE;
+               dto->creation_date = time(nullptr);
+  
                /* Call server API */
                auto addedUserResponse = client->addUser(dto);
 
@@ -70,8 +72,7 @@ void UserControllerTest::onRun()
                /* Delete newly added users */
                auto deletedUserResponse = client->deleteUser(addedUserId);
 
-               OATPP_ASSERT(deletedUserResponse->getStatusCode() == 200);
-             },
+               OATPP_ASSERT(deletedUserResponse->getStatusCode() == 200); },
              std::chrono::minutes(10) /* test timeout */);
 
   /* wait all server threads finished */

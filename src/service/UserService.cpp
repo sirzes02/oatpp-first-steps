@@ -33,7 +33,7 @@ oatpp::Object<UserDto> UserService::getUserById(const oatpp::Int32 &id, const oa
   return result[0];
 }
 
-oatpp::Object<PageDto<oatpp::Object<UserDto>>> UserService::getAllUsers(const oatpp::UInt32 &offset, const oatpp::UInt32 &limit)
+oatpp::Object<PageDto<oatpp::Object<UserDto>>> UserService::getAllUsersPagination(const oatpp::UInt32 &offset, const oatpp::UInt32 &limit)
 {
 
   oatpp::UInt32 countToFetch = limit;
@@ -43,7 +43,7 @@ oatpp::Object<PageDto<oatpp::Object<UserDto>>> UserService::getAllUsers(const oa
     countToFetch = 10;
   }
 
-  auto dbResult = m_database->getAllUsers(offset, countToFetch);
+  auto dbResult = m_database->getAllUsersPagination(offset, countToFetch);
   OATPP_ASSERT_HTTP(dbResult->isSuccess(), Status::CODE_500, dbResult->getErrorMessage());
 
   auto items = dbResult->fetch<oatpp::Vector<oatpp::Object<UserDto>>>();
@@ -66,4 +66,14 @@ oatpp::Object<StatusDto> UserService::deleteUserById(const oatpp::Int32 &userId)
   status->code = 200;
   status->message = "User was successfully deleted";
   return status;
+}
+
+oatpp::Vector<UserDto::Wrapper> UserService::getAllUsers()
+{
+  auto dbResult = m_database->getAllUsers();
+  OATPP_ASSERT_HTTP(dbResult->isSuccess(), Status::CODE_500, dbResult->getErrorMessage());
+
+  auto items = dbResult->fetch<oatpp::Vector<oatpp::Object<UserDto>>>();
+
+  return items;
 }

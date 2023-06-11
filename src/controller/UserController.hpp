@@ -83,18 +83,30 @@ public:
     return createDtoResponse(Status::CODE_200, m_userService.getUserById(userId));
   }
 
-  ENDPOINT_INFO(getUsers)
+  ENDPOINT_INFO(getUsersPagination)
   {
-    info->summary = "get all stored users";
+    info->summary = "get all stored users in pagination";
 
     info->addResponse<oatpp::Object<UsersPageDto>>(Status::CODE_200, "application/json");
     info->addResponse<Object<StatusDto>>(Status::CODE_500, "application/json");
   }
-  ENDPOINT("GET", "users/offset/{offset}/limit/{limit}", getUsers,
+  ENDPOINT("GET", "users/offset/{offset}/limit/{limit}", getUsersPagination,
            PATH(UInt32, offset),
            PATH(UInt32, limit))
   {
-    return createDtoResponse(Status::CODE_200, m_userService.getAllUsers(offset, limit));
+    return createDtoResponse(Status::CODE_200, m_userService.getAllUsersPagination(offset, limit));
+  }
+
+  ENDPOINT_INFO(getAllUsers)
+  {
+    info->summary = "get all stored users";
+
+    info->addResponse<oatpp::Vector<UserDto::Wrapper>>(Status::CODE_200, "application/json");
+    info->addResponse<Object<StatusDto>>(Status::CODE_500, "application/json");
+  }
+  ENDPOINT("GET", "users", getAllUsers)
+  {
+    return createDtoResponse(Status::CODE_200, m_userService.getAllUsers());
   }
 
   ENDPOINT_INFO(deleteUser)
