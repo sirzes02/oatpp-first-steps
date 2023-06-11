@@ -12,14 +12,14 @@
  * Test API client.
  * Use this client to call application APIs.
  */
-class MyApiTestClient : public oatpp::web::client::ApiClient {
+class MyApiTestClient : public oatpp::web::client::ApiClient
+{
 
   API_CLIENT_INIT(MyApiTestClient)
 
   API_CALL("GET", "/", getRoot)
 
   // TODO - add more client API calls here
-
 };
 
 /* End Api Client code generation */
