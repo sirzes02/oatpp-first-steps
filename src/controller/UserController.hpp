@@ -3,12 +3,15 @@
 #define UserController_hpp
 
 #include "service/UserService.hpp"
+#include "lib/MyAuthorizationObject.hpp"
 
 #include "oatpp/web/server/api/ApiController.hpp"
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 #include "oatpp/core/macro/codegen.hpp"
 
 #include OATPP_CODEGEN_BEGIN(ApiController) //<- Begin Codegen
+
+using namespace oatpp::web::server::handler;
 
 /**
  * User REST controller.
@@ -19,6 +22,7 @@ public:
   UserController(OATPP_COMPONENT(std::shared_ptr<ObjectMapper>, objectMapper))
       : oatpp::web::server::api::ApiController(objectMapper)
   {
+    setDefaultAuthorizationHandler(std::make_shared<MyBearerAuthorizationHandler>());
   }
 
 private:
@@ -103,9 +107,17 @@ public:
 
     info->addResponse<oatpp::Vector<UserDto::Wrapper>>(Status::CODE_200, "application/json");
     info->addResponse<Object<StatusDto>>(Status::CODE_500, "application/json");
+    info->addResponse<Object<StatusDto>>(Status::CODE_401, "application/json");
+
+    std::list<oatpp::String> listaDeStrings = {"read"};
+    std::shared_ptr<std::__cxx11::list<oatpp::String>> sharedPtrLista = std::make_shared<std::__cxx11::list<oatpp::String>>(listaDeStrings);
+
+    info->addSecurityRequirement("bearerAuth", sharedPtrLista);
   }
-  ENDPOINT("GET", "users", getAllUsers)
+  ENDPOINT("GET", "users", getAllUsers, AUTHORIZATION(std::shared_ptr<MyAuthorizationObject>, authObject))
   {
+    OATPP_ASSERT_HTTP(authObject->userId == "uid-admin", Status::CODE_401, "Unauthorized");
+
     return createDtoResponse(Status::CODE_200, m_userService.getAllUsers());
   }
 
